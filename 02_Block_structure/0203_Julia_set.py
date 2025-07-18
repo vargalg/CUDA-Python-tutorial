@@ -2,6 +2,18 @@ import numpy as np
 from numba import cuda
 import matplotlib.pyplot as plt
 
+
+# Kép paraméterek
+width, height = 1024, 1024
+zoom = 1.0
+move_x, move_y = 0.0, 0.0
+c_re, c_im = -0.7, 0.27015  # Julia-halmaz konstans
+max_iter = 300
+
+# CUDA Blokk méretek
+threadsperblock = (16, 16)
+
+
 @cuda.jit
 def julia_kernel(output, width, height, zoom, move_x, move_y, c_re, c_im, max_iter):
     x, y = cuda.grid(2)
@@ -23,31 +35,24 @@ def julia_kernel(output, width, height, zoom, move_x, move_y, c_re, c_im, max_it
     output[y, x] = iteration
 
 
-# Kép paraméterek
-width, height = 1024, 1024
-zoom = 1.0
-move_x, move_y = 0.0, 0.0
-c_re, c_im = -0.7, 0.27015  # Julia-halmaz konstans
-max_iter = 300
+if __name__ == '__main__':
+    # Kimeneti mátrix
+    output = np.zeros((height, width), dtype=np.uint16)
+    d_output = cuda.to_device(output)
 
-# Kimeneti mátrix
-output = np.zeros((height, width), dtype=np.uint16)
-d_output = cuda.to_device(output)
+    # CUDA paraméterek
+    blockspergrid_x = (width + threadsperblock[0] - 1) // threadsperblock[0]
+    blockspergrid_y = (height + threadsperblock[1] - 1) // threadsperblock[1]
+    blockspergrid = (blockspergrid_x, blockspergrid_y)
 
-# CUDA paraméterek
-threadsperblock = (16, 16)
-blockspergrid_x = (width + threadsperblock[0] - 1) // threadsperblock[0]
-blockspergrid_y = (height + threadsperblock[1] - 1) // threadsperblock[1]
-blockspergrid = (blockspergrid_x, blockspergrid_y)
+    # Kernel indítása
+    julia_kernel[blockspergrid, threadsperblock](d_output, width, height, zoom, move_x, move_y, c_re, c_im, max_iter)
 
-# Kernel indítása
-julia_kernel[blockspergrid, threadsperblock](d_output, width, height, zoom, move_x, move_y, c_re, c_im, max_iter)
+    # Eredmény visszamásolása
+    output = d_output.copy_to_host()
 
-# Eredmény visszamásolása
-output = d_output.copy_to_host()
-
-# Kirajzolás
-plt.imshow(output, cmap='inferno', extent=[0, width, 0, height])
-plt.title(f"Julia Set (c = {c_re} + {c_im}i)")
-plt.axis('off')
-plt.show()
+    # Kirajzolás
+    plt.imshow(output, cmap='inferno', extent=[0, width, 0, height])
+    plt.title(f"Julia Set (c = {c_re} + {c_im}i)")
+    plt.axis('off')
+    plt.show()
