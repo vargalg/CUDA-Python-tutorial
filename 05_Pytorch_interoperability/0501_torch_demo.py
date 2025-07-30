@@ -1,14 +1,12 @@
 import torch
 import torch.nn as nn
-import numba
 from numba import cuda
-import numpy as np
 
 @cuda.jit
 def add_two_kernel(data):
     idx = cuda.grid(1)
     if idx < data.size:
-        data[idx] += idx
+        data[idx] += 2
 
 
 class AddTwoNumbaFunction(torch.autograd.Function):
@@ -46,6 +44,7 @@ class AddTwoLayer(nn.Module):
 if __name__ == '__main__':
     x = torch.ones(5, device='cuda', dtype=torch.float32)
     layer = AddTwoLayer()
+    model = nn.Sequential(layer, layer)
 
-    y = layer(x)
+    y = model(x)
     print(y)  # Should be all 3's
