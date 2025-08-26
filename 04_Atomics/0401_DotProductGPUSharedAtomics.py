@@ -66,8 +66,6 @@ if __name__ == '__main__':
     # Result should be equal to N
     print(f"Dot product (GPU implementation: PartSum + Shared Mem. + Atomics): {c}    (Should be: {N})")
 
-
-
     def single_run():
         dot_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_c)
 
