@@ -1,36 +1,29 @@
-# CUDA Python
+# CUDA Python: Introduction
 
-A leírásokban a Numba künyvtár segítségével fogunk GPU kódokat írni CUDA platformra.
+In these tutorials, we will use the **Numba** library to write GPU code for the CUDA platform.
 
-## A Numba könyvtár
+## The Numba Library
 
-### Mi az a Numba?
-A Numba egy JIT (Just-In-Time) fordító, amely lehetővé teszi, hogy Python kódunkat futásidőben gépi kóddá fordítsuk. A Python nyelvű számításokat – főleg NumPy-alapú tömbműveleteket – optimalizálja, és képes CUDA GPU-n is futtatható kódot generálni, ha rendelkezésre áll egy NVIDIA GPU és a CUDA toolchain.
+### What is Numba?
+Numba is a JIT (Just-In-Time) compiler that allows us to translate Python code into machine code at runtime.  
+It optimizes Python computations—especially NumPy-based array operations—and can also generate code that runs on CUDA GPUs, provided an NVIDIA GPU and the CUDA toolchain are available.
 
-### Miért Numba?
-Python marad, de CUDA-t használ: nem kell C++ vagy CUDA C nyelvet tanulni.
+### Why Numba?
+- Python stays Python, but uses CUDA: no need to learn C++ or CUDA C.  
+- Fast prototyping for the GPU.  
+- Excellent integration with NumPy and the Python ecosystem.  
+- Easy to integrate into existing image processing projects.  
 
-Gyors prototípusfejlesztés GPU-ra.
+### Installation
 
-Kiváló integráció NumPy-val és Python-ökoszisztémával.
-
-Könnyű beépíteni meglévő képfeldolgozó projektekbe.
-
-### Telepítés
-
-``` bash
+```bash
 pip install numba
 ```
 
-részletesen: https://numba.readthedocs.io/en/stable/user/installing.html
+More details: [Numba installation guide](https://numba.readthedocs.io/en/stable/user/installing.html)
 
-### CUDA támogatás feltétele:
+### Requirements for CUDA support
 
-NVIDIA GPU (Compute Capability ≥ 3.0)
-
-Telepített CUDA Toolkit (pl. nvcc --version működjön)
-
-A numba.cuda modul használatához szükség van a megfelelő NVIDIA driverre is.
-
-
-
+- An NVIDIA GPU (Compute Capability ≥ 3.0)
+- Installed CUDA Toolkit (e.g., nvcc --version should work)
+- A compatible NVIDIA driver (required for using the numba.cuda module)
